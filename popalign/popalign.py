@@ -1403,7 +1403,7 @@ def find_best_m(pop, alpha = 3, multiplier = 3):
 			curr_df['a'] = curralpha
 			curr_df['j'] = j
 			curr_df['col'] = np.append(0*curr_values,1)
-			fm_df = fm_df.append(curr_df, ignore_index=True)
+			fm_df = fm_df.concat(curr_df, ignore_index=True)
 
 			currminvals.append(nfeats[currmin])
 		minvals.append(currminvals)
