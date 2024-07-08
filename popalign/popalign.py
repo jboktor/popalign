@@ -1403,7 +1403,7 @@ def find_best_m(pop, alpha = 3, multiplier = 3):
 			curr_df['a'] = curralpha
 			curr_df['j'] = j
 			curr_df['col'] = np.append(0*curr_values,1)
-			fm_df = fm_df.concat(curr_df, ignore_index=True)
+			fm_df = pd.concat([fm_df, curr_df], ignore_index=True)
 
 			currminvals.append(nfeats[currmin])
 		minvals.append(currminvals)
@@ -4314,8 +4314,8 @@ def plot_heatmap(pop, refcomp, genelist, samplenames = 'all', clustersamples=Tru
 
 	# Create a subsampled matrix
 	if M.shape[1] > 2000: 
-	    idx = np.random.choice(M.shape[1], 2000, replace=False) 
-	    M_small = M[:,idx]
+		idx = np.random.choice(M.shape[1], 2000, replace=False) 
+		M_small = M[:,idx]
 	else: 
 	    M_small = M
 
