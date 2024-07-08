@@ -1,6 +1,6 @@
 pandas
 scipy
-sklearn
+scikit-learn
 seaborn
 adjustText
 plotly
