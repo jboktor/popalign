@@ -1826,9 +1826,12 @@ def typer_func(gmm, prediction, M, genes, types):
 		The column normalized logged data, not gene filtered
 	genes : vector
 		Array of genes
-	types : dict
+	types : dict or list
 		Dictionary of cell types (keys) and gene lists (values)
 	'''
+	if isinstance(types, list):
+		return types
+
 	if types == 'defaultpbmc':
 		types = default_pbmc_types() # get default types
 	
