@@ -1826,12 +1826,9 @@ def typer_func(gmm, prediction, M, genes, types):
 		The column normalized logged data, not gene filtered
 	genes : vector
 		Array of genes
-	types : dict or list
+	types : dict
 		Dictionary of cell types (keys) and gene lists (values)
 	'''
-	if isinstance(types, list):
-		return types
-
 	if types == 'defaultpbmc':
 		types = default_pbmc_types() # get default types
 	
@@ -2236,7 +2233,10 @@ def build_gmms(pop, ks=(5,20), niters=3, training=0.7, nreplicates=1, reg_covar=
 
 		if types != None:
 			try:
-				pop['samples'][x]['gmm_types'] = typer_func(gmm=gmm, prediction=gmm.predict(C), M=M, genes=pop['genes'], types=types)
+				if isinstance(types, list):
+					pop['samples'][x]['gmm_types'] = types
+				else:
+					pop['samples'][x]['gmm_types'] = typer_func(gmm=gmm, prediction=gmm.predict(C), M=M, genes=pop['genes'], types=types)
 			except:
 				print('Something went wrong while typing the GMM subopulations. Skipping subpopulation typing.')
 				pop['samples'][x]['gmm_types'] = [str(ii) for ii in range(gmm.n_components)]
