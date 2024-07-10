@@ -3490,6 +3490,8 @@ def plot_deltas(pop, figsize=(10,10), sortby='mu', pthresh = 0.05, showplot=Fals
 	nreps = np.max([pop['nreplicates'],1])
 	samplist = pop['order']
 
+	pop['deltas'] = {}
+
 	for i, currtype in enumerate(celltypes): # for each reference subpopulation
 		
 		mu_ref = get_gmm_means(pop, ref, None)[i]
@@ -3684,15 +3686,25 @@ def plot_deltas(pop, figsize=(10,10), sortby='mu', pthresh = 0.05, showplot=Fals
 		deltaobj = dict()
 
 		# Combine mean data together into a single dataframe and store in pop object
-		t = pd.DataFrame(np.array([idx, mean_samplelbls, mean_delta_ws, pvals_ws, mean_delta_mus, pvals_mus, mean_delta_covs, pvals_covs]),
-		index=['origidx','orderedsamples', 'mean_delta_w','pvals_w', 'mean_delta_mu', 'pvals_mu','mean_delta_cov','pvals_cov'])      
+		stat_data = {
+			'origidx': idx,
+			'orderedsamples': mean_samplelbls,
+			'mean_delta_w': mean_delta_ws,
+			'pvals_w': pvals_ws,
+			'mean_delta_mu': mean_delta_mus,
+			'pvals_mu': pvals_mus,
+			'mean_delta_cov': mean_delta_covs,
+			'pvals_cov': pvals_covs
+		}
+		t = pd.DataFrame(stat_data)
 		t = pd.DataFrame.transpose(t);
-		deltaobj[currtype]={}
-		deltaobj[currtype]['idx'] = idx
-		deltaobj[currtype]['orderedsamples'] = xlbls
-		deltaobj[currtype]['combined'] = t # table of data
 
-	pop['deltas'] = deltaobj
+		deltaobj={}
+		deltaobj['idx'] = idx
+		deltaobj['orderedsamples'] = xlbls
+		deltaobj['combined'] = t # table of data
+		pop['deltas'][currtype] = deltaobj
+
 
 def aligner(refgmm, testgmm, method):
 	'''
