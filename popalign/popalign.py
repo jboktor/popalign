@@ -1952,7 +1952,7 @@ def render_model(pop, name, figsizesingle, showplot=False):
 	pp.set_edgecolor('face')
 	cb = plt.colorbar(pp)
 	cb.set_alpha(1)
-	cb.draw_all()
+	# cb.draw_all()
 	cb.set_label('Weighted log probability')
 	plt.xlabel('PC%d' % (x+1))
 	plt.ylabel('PC%d' % (y+1))
@@ -2233,10 +2233,7 @@ def build_gmms(pop, ks=(5,20), niters=3, training=0.7, nreplicates=1, reg_covar=
 
 		if types != None:
 			try:
-				if isinstance(types, list):
-					pop['samples'][x]['gmm_types'] = types
-				else:
-					pop['samples'][x]['gmm_types'] = typer_func(gmm=gmm, prediction=gmm.predict(C), M=M, genes=pop['genes'], types=types)
+				pop['samples'][x]['gmm_types'] = typer_func(gmm=gmm, prediction=gmm.predict(C), M=M, genes=pop['genes'], types=types)
 			except:
 				print('Something went wrong while typing the GMM subopulations. Skipping subpopulation typing.')
 				pop['samples'][x]['gmm_types'] = [str(ii) for ii in range(gmm.n_components)]
