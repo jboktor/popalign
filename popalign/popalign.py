@@ -3697,7 +3697,7 @@ def plot_deltas(pop, figsize=(10,10), sortby='mu', pthresh = 0.05, showplot=Fals
 			'pvals_cov': pvals_covs
 		}
 		t = pd.DataFrame(stat_data)
-		t = pd.DataFrame.transpose(t);
+		t = t.transpose()
 
 		deltaobj={}
 		deltaobj['idx'] = idx
