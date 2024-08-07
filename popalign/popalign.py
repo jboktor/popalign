@@ -3384,6 +3384,36 @@ def compute_delta_w(pop, w_ref, itest, sample, rep):
 		delta_w = w_ref - sum(w_test)
 		return np.array(delta_w)
 
+def compute_delta_mu_prenorm(pop, mu_ref, itest, sample, rep):
+	'''
+	Compute change in w between reference component and all components in the test sample that align to it and return full vector of delta mu values. 
+
+	Parameters
+	----------
+	pop : dict
+		Popalign object
+	w_ref : float
+		w (abundance) for the reference component
+	itest : array
+		array of indexes for all components that align to specified reference component
+	sample : str
+		sample name
+	rep : 
+		replicate index. Default: 0
+
+	Output
+	----------
+	np.array(delta_w) : array
+		delta_w (scalar) returned as an array    
+	'''
+	dlist = []
+	for k in range(len(itest)): 
+		currindex = itest[k]
+		curr_mu = pop['samples'][sample]['replicates'][rep]['gmm'].means_[currindex]
+		curr_d = curr_mu - mu_ref
+		dlist.append(curr_d)
+	return np.array(dlist)
+
 def compute_delta_mu(pop, mu_ref, itest, sample, rep):
 	'''
 	Compute delta mu between reference component and all components in the test sample that align to it. 
@@ -3717,7 +3747,7 @@ def aligner(refgmm, testgmm, method):
 	testgmm	: sklearn.mixture.GaussianMixture
 		Test model
 	method : str
-		Alignment method. Must be one of: test2ref, ref2test, conservative
+		Alignment method. Must be one of: test2ref, ref2test, conservative, celltype
 
 	Output
 	----------
@@ -3739,8 +3769,8 @@ def aligner(refgmm, testgmm, method):
 			covref = refgmm.covariances_[j]
 			arr[i, j] = JeffreyDiv(mutest, covtest, muref, covref) # compute all pairwise JD values
 
-	if method not in ['test2ref', 'ref2test', 'conservative']:
-		raise Exception('method must be one of: test2ref, ref2test, conservative')
+	if method not in ['test2ref', 'ref2test', 'conservative', 'celltype']:
+		raise Exception('method must be one of: test2ref, ref2test, conservative', 'celltype')
 	if method == 'test2ref':
 		minsidx = np.argmin(arr, axis=1) # get idx of closest ref mixture for each test mixture
 		mins = np.min(arr, axis=1) # get min divergence values
@@ -3767,7 +3797,16 @@ def aligner(refgmm, testgmm, method):
 		res = np.zeros((len(idx), 3))
 		for ii, i in enumerate(idx):
 			res[ii,:] = np.array([i, minsidx[i], mins[i]])
+
+	elif method == 'celltype':
+		if ltest != lref:
+			raise ValueError("Number of components in refgmm and testgmm must be the same for 'celltype' method")
+		res = np.zeros((ltest, 3))
+		for i in range(ltest):
+			res[i, :] = np.array([i, i, arr[i, i]])
+			
 	return res, arr
+
 
 def align(pop, ref=None, method='conservative', figsizedeltas=(10,10), figsizeentropy=(10,10)):
 	'''
@@ -3784,6 +3823,7 @@ def align(pop, ref=None, method='conservative', figsizedeltas=(10,10), figsizeen
 		If conservative, the reference component and the test component have to be each other's best match to align
 		If test2ref, the closest reference component is found for each test component
 		If ref2test, the closest test component is found for each ref component
+		If celltype, identical cell types are aligned, assumes indicies are identical cell types (should be used with caution)
 	figsizedeltas : tuple, optional
 		Size of the figure for the delta plot. Default is (10,5)
 	figsizeentropy : tuple, optional
